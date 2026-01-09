@@ -1,0 +1,13 @@
+server:
+  port: 0 # 포트번호를 임의로 부여받을 수 있도록 명시 X
+spring:
+  application:
+    name: 2nd-service
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.instance.instance-id:${random.value}}
+  client:
+    fetch-registry: true #  다른 서비스 목록을 받아옴
+    register-with-eureka: true # 현재 서비스를 Eureka Server에 등록
+    service-url:
+      defaultZone: http://localhost:8761/eureka
