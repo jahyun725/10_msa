@@ -1,0 +1,8 @@
+# 서버 부팅 시 제일 먼저 인식하고 적용하는 파일
+#implementation 'org.springframework.cloud:spring-cloud-starter-config'
+#config-server가 과나리하는 msa-config.yml파일을 읽어옴
+spring:
+  cloud:
+    config:
+      uri: http://localhost:8888
+      name: msa-config

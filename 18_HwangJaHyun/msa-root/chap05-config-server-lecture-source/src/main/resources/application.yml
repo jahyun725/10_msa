@@ -1,0 +1,10 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:  # git으로 관리되는 폴더 내 설정 파일을 읽어옴(commit 상태여야 함)
+          uri: C:\SWCAMP22\10_msa\18_HwangJaHyun\msa-root\config # [설정파일이 담긴 깃 레포지토리 경로]
