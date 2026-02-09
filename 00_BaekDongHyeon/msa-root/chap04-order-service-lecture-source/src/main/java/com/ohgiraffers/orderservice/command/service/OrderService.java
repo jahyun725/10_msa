@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 /*
  * 주문 관련 비즈니스 로직을 처리하는 서비스
@@ -33,6 +34,8 @@ public class OrderService {
     // userId를 직접 사용해 주문 생성 전에 사용자의 등급을 알아올 수 있음
     // Feign Client를 통해 User Service 호출
     String userStatus = userClient.getUserGrade(userId).getData();
+
+
     System.out.println("userStatus = " + userStatus);
     if (userStatus == null || userStatus.isEmpty()) {
       throw new IllegalArgumentException("유효하지 않은 사용자 등급입니다.");
@@ -41,6 +44,7 @@ public class OrderService {
     // 주문 생성 로직
     // PREMIUM 등급인 경우 10% 할인 적용
     if ("PREMIUM".equals(userStatus)) orderDTO.setPrice(orderDTO.getPrice() * 0.9);
+
     Order order = modelMapper.map(orderDTO, Order.class);
     order.createOrder(userId, LocalDateTime.now());
     Order savedOrder = orderRepository.save(order);
@@ -64,6 +68,7 @@ public class OrderService {
     orderDTO.setOrderDate(savedOrder.getOrderDate());
     return orderDTO;
   }
+
 
 
 }

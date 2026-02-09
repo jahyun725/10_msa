@@ -11,36 +11,30 @@ spring:
         webflux:
           routes:
             # --- [첫 번째 서비스 라우팅 규칙] ---
-            - id: 1st-service
-              # lb:// 의미: Load Balancer. Eureka에 등록된 '1ST-SERVICE'라는 이름을 찾아가며,
+            - id: user-service
+              # lb:// 의미: Load Balancer. Eureka에 등록된 'SWCAMP-USER-SERVICE'라는 이름을 찾아가며,
               # 여러 인스턴스가 있을 경우 로드밸런싱(부하분산)을 수행
-              uri: lb://1ST-SERVICE
+              uri: lb://SWCAMP-USER-SERVICE
               predicates:
-                # 조건: 사용자가 'http://gateway:8000/first-service/**'로 요청을 보내면 이 규칙이 발동함
-                - Path=/first-service/**
+                # 조건: 사용자가 'http://gateway:8000/api/v1/user-service/**'로 요청을 보내면 이 규칙이 발동함
+                - Path=/api/v1/user-service/**
               filters:
                 # 1. 경로 재작성:
-                #    들어온 요청 '/first-service/health' -> 나가는 요청 '/health'
+                #    들어온 요청 '/api/v1/user-service/health' -> 나가는 요청 '/health'
                 #    (?<segment>.*)는 나머지 경로를 변수로 캡처하여 $\{segment}에 넣음
-                - RewritePath=/first-service/(?<segment>.*), /$\{segment}
+                - RewritePath=/api/v1/user-service/(?<segment>.*), /$\{segment}
+                - name: CircuitBreaker # 회로 차단기 == M.S에 문제가 있거나 응답이 지연될 경우 동작
+                  args:
+                    name: userServiceCB
+                    fallbackUri: forward:/fallback/user
+                    # fallback : 대안
 
-                # 2. 헤더 추가 (테스트용):
-                #    백엔드 서비스(1st-service)로 보낼 때 'first-request' 헤더를 강제로 추가
-                - AddRequestHeader=first-request, first-request-value
-
-                # 3. 응답 헤더 추가 (테스트용):
-                #    사용자에게 응답을 줄 때 'first-response' 헤더를 강제로 추가
-                - AddResponseHeader=first-response, first-response-value
-
-            # --- [두 번째 서비스 라우팅 규칙] ---
-            - id: 2nd-service
-              uri: lb://2ND-SERVICE
+            - id: order-service
+              uri: lb://SWCAMP-ORDER-SERVICE
               predicates:
-                - Path=/second-service/**
+                - Path=/api/v1/order-service/**
               filters:
-                - RewritePath=/second-service/(?<segment>.*), /$\{segment}
-                - AddRequestHeader=second-request, second-request-value
-                - AddResponseHeader=second-response, second-response-value
+                - RewritePath=/api/v1/order-service/(?<segment>.*), /$\{segment}
 
 # Eureka Server(전화번호부) 설정
 eureka:

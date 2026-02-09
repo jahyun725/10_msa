@@ -1,0 +1,70 @@
+### 회원 가입
+POST http://localhost:8000/api/v1/user-service/users
+Content-Type: application/json
+
+{
+  "username" : "user01",
+  "password" : "pass01"
+}
+
+
+### 로그인
+POST http://localhost:8000/api/v1/user-service/auth/login
+Content-Type: application/json
+
+{
+  "username" : "user01",
+  "password" : "pass01"
+}
+
+> {%
+    // 응답 결과에서 accessToken 값을 추출하여 auth_token 변수에 저장
+    client.global.set("auth_token", response.body.data.accessToken);
+    client.global.set("refresh_token", response.body.data.refreshToken);
+    client.log("accessToken stored: " + client.global.get("auth_token"));
+    client.log("refreshToken stored: " + client.global.get("refresh_token"));
+%}
+
+
+### 내 정보 조회
+GET http://localhost:8000/api/v1/user-service/users/me
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+
+### 토큰 재발급
+POST http://localhost:8000/api/v1/user-service/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken" : "{{refresh_token}}"
+}
+
+> {%
+    client.global.set("refresh_token", response.body.data.refreshToken);
+%}
+
+
+
+
+### 로그아웃
+POST http://localhost:8000/api/v1/user-service/auth/logout
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "refreshToken" : "{{refresh_token}}"
+}
+
+
+### 주문하기 (Feign Client를 이용한 Micro Service간의 통신 확인)
+POST http://localhost:8000/api/v1/order-service/orders
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "product": "구매한 상품222",
+  "quantity": 333,
+  "price": 10000
+}
+
